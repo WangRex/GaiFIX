@@ -1,0 +1,6 @@
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Core.dll.config
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Core.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Core.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Core\obj\Debug\Apps.Core.csprojResolveAssemblyReference.cache
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Core\obj\Debug\Apps.Core.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Core\obj\Debug\Apps.Core.pdb

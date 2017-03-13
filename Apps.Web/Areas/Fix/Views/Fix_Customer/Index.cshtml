@@ -1,0 +1,295 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.FIX.FIX_CustomerModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div id="uploadExcel" class="easyui-window displaynone" data-options="modal:true,closed:true,minimizable:false,shadow:false">
+    <form name="form1" method="post" id="form1">
+        <table>
+            <tr>
+                <th style="padding:20px;">Excel：</th>
+                <td style="padding:20px;">
+                    <input name="ExcelPath" type="text" maxlength="255" id="txtExcelPath" readonly="readonly" style="width:200px" class="txtInput normal left">
+                    <a href="javascript:$('#FileUpload').trigger('click').void(0);" class="files">@Resource.Browse</a>
+                    <input class="displaynone" type="file" id="FileUpload" name="FileUpload" onchange="Upload('ExcelFile', 'txtExcelPath', 'FileUpload');">
+                    <span class="uploading">@Resource.Uploading</span>
+                </td>
+            </tr>
+        </table>
+        <div class="endbtndiv">
+            <a id="btnSave" href="javascript:ImportData()" class="easyui-linkbutton btns">@Resource.Save</a>
+            <a id="btnReturn" href="javascript:$('#uploadExcel').window('close')" class="easyui-linkbutton btnc">@Resource.Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="mvctool">
+    @Html.ToolButton("btnQuery", "fa fa-search", "查询", ref perm, "Query", true)
+    @Html.ToolButton("btnAdd", "fa fa-plus", "添加", ref perm, "Create", true)
+    @Html.ToolButton("btnSave", "fa fa-save", Resource.Save, ref perm, "Save", true)
+    @Html.ToolButton("btnDelete", "fa fa-trash", Resource.Delete, ref perm, "Delete", true)
+    @Html.ToolButton("btnImport", "fa fa-level-down", Resource.Import, ref perm, "Import", true)
+</div>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+<table id="grid_list"></table>
+<div id="Pager"></div>
+<script type="text/javascript">
+    var departmentCombList = "";
+    function unitformatterDep(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < departmentCombList.length; i++) {
+            if (departmentCombList[i].Id == value) {
+                return departmentCombList[i].Name;
+            }
+        }
+    };
+    $.ajax({
+        type: "post",
+        url: "/SysStruct/departmentJsonList",
+        async: false,
+        success: function (data) {
+            departmentCombList = data;
+        }
+    });
+    function SetPosTree(depId, refFlag) {
+        $('#posTree').combotree({
+            url: '/SysPosition/GetPosListByComTree?depId=' + depId
+                 , onSelect: function (node) {
+                     $("#PosId").val(node.id);
+                 }, onLoadSuccess: function (node, data) { //加载成功选择第一行
+
+                 }
+        });
+    }
+    //分类combotree
+    $('#structTree').combotree({
+        url: '/SysStruct/GetListByComTree?id=root'
+        , onSelect: function (node) {
+            $("#DepId").val(node.id);
+            $("#PosId").val("");
+            $('#posTree').combotree('setValue', "");
+            SetPosTree(node.id)
+        }, onLoadSuccess: function (node, data) { //加载成功选择第一行
+
+            SetPosTree($("#DepId").val(), true);
+        }
+    });
+    var StatusCombList = [{ "value": "未匹配", "text": "未匹配" }, { "value": "已匹配", "text": "已匹配" }];
+    function unitformatterStatus(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < StatusCombList.length; i++) {
+            if (StatusCombList[i].value == value) {
+                return StatusCombList[i].text;
+            }
+        }
+    };
+    var editRow = undefined;
+    $(function () {
+        $('#grid_list').datagrid({
+            url: '/Fix_Customer/GetList',
+            width: SetGridWidthSub(10),
+            methord: 'post',
+            singleSelect: true,
+            height: SetGridHeightSub(85),
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true,
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 25, hidden: true },
+                { field: 'Name', title: '@Html.LabelFor(model => model.Name)', width: 415, editor: { type: 'validatebox' } },
+                { field: 'Phone', title: '@Html.LabelFor(model => model.Phone)', width: 120, editor: { type: 'validatebox' } },
+                { field: 'Tel', title: '@Html.LabelFor(model => model.Tel)', width: 120, editor: { type: 'validatebox' } },
+                { field: 'Address', title: '@Html.LabelFor(model => model.Address)', width: 300, editor: { type: 'validatebox' } },
+            ]],
+            toolbar: [
+                {
+                    text: '撤销', iconCls: 'fa fa-reply', handler: function () {
+                        editRow = undefined;
+                        $("#grid_list").datagrid('rejectChanges');
+                        $("#grid_list").datagrid('unselectAll');
+                    }
+                },
+            '-', {
+                text: '上移', iconCls: 'fa fa-arrow-up', handler: function () {
+                    MoveUp();
+                }
+            }, '-', {
+                text: '下移', iconCls: 'fa fa-arrow-down', handler: function () {
+                    MoveDown();
+                }
+            }],
+            onAfterEdit: function (rowIndex, rowData, changes) {
+                editRow = undefined;
+            },
+            onDblClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+                }
+
+                if (editRow == undefined) {
+                    $("#grid_list").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+
+                }
+
+            }
+        });
+    });
+    function MoveUp() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'up', 'grid_list');
+
+    }
+    //下移
+    function MoveDown() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'down', 'grid_list');
+
+    }
+
+    function mysort(index, type, gridname) {
+        if ("up" == type) {
+            if (index != 0) {
+                var toup = $('#' + gridname).datagrid('getData').rows[index];
+                var todown = $('#' + gridname).datagrid('getData').rows[index - 1];
+                $('#' + gridname).datagrid('getData').rows[index] = todown;
+                $('#' + gridname).datagrid('getData').rows[index - 1] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index - 1);
+                $('#' + gridname).datagrid('selectRow', index - 1);
+            }
+        } else if ("down" == type) {
+            var rows = $('#' + gridname).datagrid('getRows').length;
+            if (index != rows - 1) {
+                var todown = $('#' + gridname).datagrid('getData').rows[index];
+                var toup = $('#' + gridname).datagrid('getData').rows[index + 1];
+                $('#' + gridname).datagrid('getData').rows[index + 1] = todown;
+                $('#' + gridname).datagrid('getData').rows[index] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index + 1);
+                $('#' + gridname).datagrid('selectRow', index + 1);
+            }
+        }
+
+    }
+    function Refresh() {
+        $('#grid_list').datagrid('reload');
+        editRow = undefined;
+        $("#grid_list").datagrid('rejectChanges');
+        $("#grid_list").datagrid('unselectAll');
+    }
+</script>
+@Html.Partial("~/Views/Shared/_Partial_AutoGrid.cshtml")
+
+@*operation*@
+<script type="text/javascript">
+    //ifram 返回
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    }
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid_list").datagrid('load');
+        else
+            $("#grid_list").datagrid('reload');
+    }
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Resource.Tip', mes);
+    }
+    $(function () {
+        $("#btnQuery").click(function () {
+            var DepId = $("#DepId").val();
+            var StatusValue = $("#StatusSelect").combobox('getValue');
+            $("#grid_list").datagrid("load", { DepId: DepId, StatusValue: StatusValue });
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Resource.Tip', '@Resource.YouWantToDeleteTheSelectedRecords', function (r) {
+                    if (r) {
+                        $.post("/Fix_Customer/Delete?id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                $("#grid_list").datagrid('load');
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+                            else {
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+
+        $("#btnSave").click(function () {
+            $("#grid_list").datagrid('endEdit', editRow);
+            var rows = $("#grid_list").datagrid('getChanges');
+            var rowstr = JSON.stringify(rows);
+            $.post('/Fix_Customer/CreatByGrid', rowstr, function (data) {
+                $.messageBox5s('@Resource.Tip', data.message);
+                if (data.type == 1)
+                    $("#grid_list").datagrid('reload');
+            }, "json");
+        });
+        $("#btnAdd").click(function () {
+            if (editRow != undefined) {
+                $("#grid_list").datagrid('endEdit', editRow);
+            }
+            if (editRow == undefined) {
+                $("#grid_list").datagrid('insertRow', {
+                    index: 0,
+                    row: {}
+                });
+
+                $("#grid_list").datagrid('beginEdit', 0);
+                editRow = 0;
+            }
+        });
+        $("#btnImport").click(function () {
+            $("#txtExcelPath").val("");
+            $("#uploadExcel").window({ title: '@Resource.Import', width: 450, height: 194, iconCls: 'fa fa-level-down' }).window('open');
+        });
+    });
+    function ImportData()
+    {
+        showLoading();
+        var url = "@Url.Action("Import")?filePath=" + $("#txtExcelPath").val();
+
+        $.post(url, function (data) {
+            if (data.type == 1) {
+                $("#grid_list").datagrid('load');
+                $('#uploadExcel').window('close');
+                $('#FileUpload').val('');
+            }
+            hideLoading();
+            $.messageBox5s('提示', data.message);
+        }, "json");
+    }
+</script>
+
+

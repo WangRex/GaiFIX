@@ -1,0 +1,419 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@using Apps.Models.Enum
+@model Apps.Models.LianTong.LianTong_ProjectContractsModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+<script src="@Url.Content("~/Scripts/easyui/jquery.easyui.extends.js")" type="text/javascript"></script>
+<div class="mvctool">
+    @Html.ToolButton("btnQuery", "fa fa-search", "按部门查询", ref perm, "Query", true)
+    @Html.ToolButton("btnSave", "fa fa-save", Resource.Save, ref perm, "Save", true)
+    @Html.ToolButton("btnCheck", "fa  fa-check", Resource.Check, ref perm, "Allot", true)
+    @Html.ToolButton("btnUnCheck", "fa  fa-ban", Resource.UnCheck, ref perm, "Rollback", true)
+    @Html.ToolButton("btnDetails", "fa fa-list", "工程详情", ref perm, "Details", true)
+    @Html.ToolButton("btnStep1", "fa fa-forward", "1.合同送审", ref perm, "Step1", true)
+    @Html.ToolButton("btnStep2", "fa fa-forward", "2.合同补全", ref perm, "Step2", true)
+    @Html.ToolButton("btnStep3", "fa fa-forward", "3.合同审订", ref perm, "Step3", true)
+    @Html.ToolButton("btnStep4", "fa fa-forward", "4.合同开票", ref perm, "Step4", true)
+    @Html.ToolButton("btnStep5", "fa fa-forward", "5.合同回款", ref perm, "Step5", true)
+    @Html.ToolButton("btnStep6", "fa fa-forward", "6.合同完结", ref perm, "Step6", true)
+</div>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+<table id="grid_list"></table>
+<div id="Pager"></div>
+<script type="text/javascript">
+    function SetButtonActive(BtNum) {
+        $('#btnStep1').css('background', 'white');
+        $('#btnStep2').css('background', 'white');
+        $('#btnStep3').css('background', 'white');
+        $('#btnStep4').css('background', 'white');
+        $('#btnStep5').css('background', 'white');
+        $('#btnStep6').css('background', 'white');
+        $('#btnStep' + BtNum).css("background", "yellow");
+    };
+    var editRow = undefined;
+    $(function () {
+        var CurrentStep = @(ViewBag.CurrentStep);
+        var editorFlag = true;
+        SetButtonActive(@(ViewBag.CurrentStep));
+        $('#grid_list').datagrid({
+            url: '/LianTong_ContractsProcess/GetList?queryStr=' + '@(ViewBag.CurrentStep)',
+            width: SetGridWidthSub(10),
+            methord: 'post',
+            singleSelect: true,
+            height: SetGridHeightSub(45),
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true,
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 25, hidden: true },
+                { field: 'disable', title: '@Resource.TitleID', width: 25, hidden: true },
+                { field: 'status', title: '@Html.LabelFor(model => model.status)', width: 80 },
+                { field: 'designName', title: '@Html.LabelFor(model => model.designName)', width: 253 },
+                { field: 'designNum', title: '@Html.LabelFor(model => model.designNum)', width: 80 },
+                { field: 'projectNum', title: '@Html.LabelFor(model => model.projectNum)', width: 80 },
+                { field: 'contractNum', title: '@Html.LabelFor(model => model.contractNum)', width: 80 },
+                { field: 'orderNum', title: '@Html.LabelFor(model => model.orderNum)', width: 80 },
+                { field: 'outlineCost', title: '@Html.LabelFor(model => model.outlineCost)', width: 80, sortable: true },
+                { field: 'submitCost', title: '@Html.LabelFor(model => model.submitCost)', width: 80, sortable: true },
+                { field: 'approveCost', title: '@Html.LabelFor(model => model.approveCost)', width: 80, sortable: true },
+                { field: 'contractCost', title: '@Html.LabelFor(model => model.contractCost)', width: 80 },
+                { field: 'departmentName', title: '@Html.LabelFor(model => model.departmentName)', width: 80 },
+                { field: 'ownerAdmin', title: '@Html.LabelFor(model => model.ownerAdmin)', width: 80 },
+                { field: 'projectClass1', title: '@Html.LabelFor(model => model.projectClass1)', width: 80 },
+                { field: 'projectClass2', title: '@Html.LabelFor(model => model.projectClass2)', width: 80 },
+                { field: 'subContractFlg', title: '@Html.LabelFor(model => model.subContractFlg)', width: 80, sortable: true },
+                { field: 'subContractCompany', title: '@Html.LabelFor(model => model.subContractCompany)', width: 80, sortable: true },
+                { field: 'subContractAdmin', title: '@Html.LabelFor(model => model.subContractAdmin)', width: 80, sortable: true },
+                { field: 'subContractTel', title: '@Html.LabelFor(model => model.subContractTel)', width: 80, sortable: true },
+                { field: 'viePrice', title: '@Html.LabelFor(model => model.viePrice)', width: 80 },
+                { field: 'taxIncrease', title: '@Html.LabelFor(model => model.taxIncrease)', width: 80 },
+                { field: 'taxPrice', title: '@Html.LabelFor(model => model.taxPrice)', width: 80 },
+                { field: 'invoiceNum', title: '@Html.LabelFor(model => model.invoiceNum)', width: 80 },
+                { field: 'invoiceDate', title: '@Html.LabelFor(model => model.invoiceDate)', width: 100 },
+                { field: 'validDate', title: '@Html.LabelFor(model => model.validDate)', width: 100 },
+                { field: 'projectOrderList', title: '@Html.LabelFor(model => model.projectOrderList)', width: 150 },
+                { field: 'historyRecord', title: '@Html.LabelFor(model => model.historyRecord)', width: 300, formatter: function (value, row, index) { return "<a href='javascript:void(0);' onclick='AppHisDetails(" + row.Id + ");'>" + value + "</a>"; } }
+            ]],
+            toolbar: [
+               {
+                   text: '撤销', iconCls: 'fa fa-reply', handler: function () {
+                       editRow = undefined;
+                       $("#grid_list").datagrid('rejectChanges');
+                       $("#grid_list").datagrid('unselectAll');
+                   }
+               },
+           '-', {
+               text: '上移', iconCls: 'fa fa-arrow-up', handler: function () {
+                   MoveUp();
+               }
+           }, '-', {
+               text: '下移', iconCls: 'fa fa-arrow-down', handler: function () {
+                   MoveDown();
+               }
+           }],
+            onAfterEdit: function (rowIndex, rowData, changes) {
+                editRow = undefined;
+            },
+            onDblClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+                }
+
+                if (editRow == undefined && rowData.disable == 0) {
+                    $("#grid_list").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+
+                }
+            },
+            onLoadSuccess: function (data) {
+                if(CurrentStep == 1) {
+                    if(editorFlag) {
+                        //添加validDate列editor
+                        $("#grid_list").datagrid('addEditor', [{
+                            field: 'validDate', editor: {
+                                type: 'datebox'
+                            }
+                        },{
+                            field: 'projectNum', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'contractNum', editor: {
+                                type: 'validatebox'
+                            }
+                        }]);
+                        editRow = undefined;
+                        editorFlag = false;
+                    }
+                } else if(CurrentStep == 2) {
+                    if(editorFlag) {
+                        $("#grid_list").datagrid('removeEditor', 'validDate');
+                        $("#grid_list").datagrid('addEditor', [{
+                            field: 'projectNum', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'contractNum', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'outlineCost', editor: {
+                                type: 'numberbox'
+                            }
+                        },{
+                            field: 'submitCost', editor: {
+                                type: 'numberbox'
+                            }
+                        },{
+                            field: 'subContractFlg', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'subContractCompany', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'subContractAdmin', editor: {
+                                type: 'validatebox'
+                            }
+                        },{
+                            field: 'subContractTel', editor: {
+                                type: 'validatebox'
+                            }
+                        }]);
+                        editRow = undefined;
+                        editorFlag = false;
+                    }
+                }
+            }
+        });
+    });
+
+    function MoveUp() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'up', 'grid_list');
+
+    }
+    //下移
+    function MoveDown() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'down', 'grid_list');
+
+    }
+
+    function mysort(index, type, gridname) {
+        if ("up" == type) {
+            if (index != 0) {
+                var toup = $('#' + gridname).datagrid('getData').rows[index];
+                var todown = $('#' + gridname).datagrid('getData').rows[index - 1];
+                $('#' + gridname).datagrid('getData').rows[index] = todown;
+                $('#' + gridname).datagrid('getData').rows[index - 1] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index - 1);
+                $('#' + gridname).datagrid('selectRow', index - 1);
+            }
+        } else if ("down" == type) {
+            var rows = $('#' + gridname).datagrid('getRows').length;
+            if (index != rows - 1) {
+                var todown = $('#' + gridname).datagrid('getData').rows[index];
+                var toup = $('#' + gridname).datagrid('getData').rows[index + 1];
+                $('#' + gridname).datagrid('getData').rows[index + 1] = todown;
+                $('#' + gridname).datagrid('getData').rows[index] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index + 1);
+                $('#' + gridname).datagrid('selectRow', index + 1);
+            }
+        }
+
+    }
+    function Refresh() {
+        $('#grid_list').datagrid('reload');
+        editRow = undefined;
+        $("#grid_list").datagrid('rejectChanges');
+        $("#grid_list").datagrid('unselectAll');
+    }
+</script>
+@Html.Partial("~/Views/Shared/_Partial_AutoGrid.cshtml")
+
+@*operation*@
+<script type="text/javascript">
+    //ifram 返回
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    }
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid_list").datagrid('load');
+        else
+            $("#grid_list").datagrid('reload');
+    }
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Resource.Tip', mes);
+    }
+    function AppHisDetails(ContractId) {
+        $("#modalwindow").html("<iframe width='100%' height='100%' scrolling='auto' frameborder='0' src='/LianTong/LianTong_ContractApproveHistory/Index?ContractId=" + ContractId + "&Iedate=" + GetGuid() + "'></iframe>");
+        $("#modalwindow").window({ title: '@Resource.Details', width: 720, height: 400, iconCls: 'fa fa-list' }).window('open');
+    }
+    $(function () {
+        $("#btnCheck").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.ajax({
+                    url: "/LianTong/LianTong_ContractsProcess/Check",
+                    type: "Post",
+                    data: { Id: row.Id },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1)
+                            $("#grid_list").datagrid('reload');
+                        $.messageBox5s('@Resource.Tip', data.message);
+                    }
+                });
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+        $("#btnUnCheck").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.ajax({
+                    url: "/LianTong/LianTong_ContractsProcess/UnCheck",
+                    type: "Post",
+                    data: { Id: row.Id },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == 1)
+                            $("#grid_list").datagrid('reload');
+                        $.messageBox5s('@Resource.Tip', data.message);
+                    }
+                });
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+        $("#btnStep1").click(function () {
+            SetButtonActive(1);
+            var queryStr = '@FlowLianTongContracts.送审.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+            $("#grid_list").datagrid('removeEditor', ['projectNum', 'contractNum', 'outlineCost','submitCost','subContractFlg','subContractCompany','subContractAdmin','subContractTel', 'validDate', 'approveCost', 'invoiceNum', 'invoiceDate']);
+            //添加validDate列editor
+            $("#grid_list").datagrid('addEditor', [{
+                field: 'validDate', editor: {
+                    type: 'datebox'
+                }
+            },{
+                field: 'projectNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'contractNum', editor: {
+                    type: 'validatebox'
+                }
+            }]);
+            editRow = undefined;
+        });
+        $("#btnStep2").click(function () {
+            SetButtonActive(2);
+            var queryStr = '@FlowLianTongContracts.补全.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+            //这里的validDate是需要移除editor的列的field值
+            $("#grid_list").datagrid('removeEditor', ['projectNum', 'contractNum', 'outlineCost','submitCost','subContractFlg','subContractCompany','subContractAdmin','subContractTel', 'validDate', 'approveCost', 'invoiceNum', 'invoiceDate']);
+            $("#grid_list").datagrid('addEditor', [{
+                field: 'projectNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'contractNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'outlineCost', editor: {
+                    type: 'numberbox'
+                }
+            },{
+                field: 'submitCost', editor: {
+                    type: 'numberbox'
+                }
+            },{
+                field: 'subContractFlg', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'subContractCompany', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'subContractAdmin', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'subContractTel', editor: {
+                    type: 'validatebox'
+                }
+            }]);
+            editRow = undefined;
+        });
+        $("#btnStep3").click(function () {
+            SetButtonActive(3);
+            var queryStr = '@FlowLianTongContracts.审订.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+            $("#grid_list").datagrid('removeEditor', ['projectNum', 'contractNum', 'outlineCost','submitCost','subContractFlg','subContractCompany','subContractAdmin','subContractTel', 'validDate', 'approveCost', 'invoiceNum', 'invoiceDate']);
+            $("#grid_list").datagrid('addEditor', [{
+                field: 'projectNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'contractNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'approveCost', editor: {
+                    type: 'numberbox'
+                }
+            }]);
+            editRow = undefined;
+        });
+        $("#btnStep4").click(function () {
+            SetButtonActive(4);
+            var queryStr = '@FlowLianTongContracts.开票.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+            $("#grid_list").datagrid('removeEditor', ['projectNum', 'contractNum', 'outlineCost','submitCost','subContractFlg','subContractCompany','subContractAdmin','subContractTel', 'validDate', 'approveCost', 'invoiceNum', 'invoiceDate']);
+            $("#grid_list").datagrid('addEditor', [{
+                field: 'invoiceNum', editor: {
+                    type: 'validatebox'
+                }
+            },{
+                field: 'invoiceDate', editor: {
+                    type: 'datebox'
+                }
+            }]);
+            editRow = undefined;
+        });
+        $("#btnStep5").click(function () {
+            SetButtonActive(5);
+            var queryStr = '@FlowLianTongContracts.回款.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+            $("#grid_list").datagrid('removeEditor', ['projectNum', 'contractNum', 'outlineCost','submitCost','subContractFlg','subContractCompany','subContractAdmin','subContractTel', 'validDate', 'approveCost', 'invoiceNum', 'invoiceDate']);
+            editRow = undefined;
+        });
+        $("#btnStep6").click(function () {
+            SetButtonActive(6);
+            var queryStr = '@FlowLianTongContracts.完结.GetInt()';
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+        });
+        $("#btnDetails").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='100%' scrolling='auto' frameborder='0' src='/LianTong/LianTong_Project/Details?ContractsId=" + row.Id + "&Iedate=" + GetGuid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Resource.Details', width: 720, height: 400, iconCls: 'fa fa-list' }).window('open');
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+        $("#btnSave").click(function () {
+            $("#grid_list").datagrid('endEdit', editRow);
+            //如果调用acceptChanges(),使用getChanges()则获取不到编辑和新增的数据。
+            //使用JSON序列化datarow对象，发送到后台。
+            var rows = $("#grid_list").datagrid('getChanges');
+            var rowstr = JSON.stringify(rows);
+            $.post('/LianTong_ContractsProcess/CreatByGrid', rowstr, function (data) {
+                $.messageBox5s('@Resource.Tip', data.message);
+                if (data.type == 1)
+                    $("#grid_list").datagrid('reload');
+            }, "json");
+        });
+    });
+</script>

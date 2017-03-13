@@ -1,0 +1,237 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.LianTong.LianTong_SystemCenterFinancialModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div class="mvctool">
+    <input id="txtQuery" type="text" class="searchText" />
+    @Html.ToolButton("btnQuery", "fa fa-search", "查询", ref perm, "Query", true)
+    @Html.ToolButton("btnAdd", "fa fa-plus", "添加", ref perm, "Create", true)
+    @Html.ToolButton("btnSave", "fa fa-save", Resource.Save, ref perm, "Save", true)
+    @Html.ToolButton("btnDelete", "fa fa-trash", Resource.Delete, ref perm, "Delete", true)
+    @Html.ToolButton("btnDetails", "fa fa-list", "财务详情", ref perm, "Details", true)
+</div>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+<table id="grid_list"></table>
+<div id="Pager"></div>
+
+<script type="text/javascript">
+    var TypeCombList = [{ "value": "采购", "text": "采购" }, { "value": "报销", "text": "报销" }];
+    var StatusCombList = [{ "value": "申请", "text": "申请" }, { "value": "已报销", "text": "已报销" }];
+    function unitformatterType(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < TypeCombList.length; i++) {
+            if (TypeCombList[i].value == value) {
+                return TypeCombList[i].text;
+            }
+        }
+    };
+    function unitformatterStatus(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < StatusCombList.length; i++) {
+            if (StatusCombList[i].value == value) {
+                return StatusCombList[i].text;
+            }
+        }
+    };
+    var editRow = undefined;
+    $(function () {
+        $('#grid_list').datagrid({
+            url: '/LianTong_SystemCenterFinancial/GetList',
+            width: SetGridWidthSub(10),
+            methord: 'post',
+            singleSelect: true,
+            height: SetGridHeightSub(45),
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true,
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 25, hidden: true },
+                { field: 'Date', title: '@Html.LabelFor(model => model.Date)', width: 90, editor: { type: 'datebox' } },
+                { field: 'Type', title: '@Html.LabelFor(model => model.Type)', width: 90, formatter: unitformatterType, editor: { type: 'combobox', options: { data: TypeCombList, valueField: "value", textField: "text" } } },
+                { field: 'Status', title: '@Html.LabelFor(model => model.Status)', width: 90, formatter: unitformatterStatus, editor: { type: 'combobox', options: { data: StatusCombList, valueField: "value", textField: "text" } } },
+                { field: 'Operator', title: '@Html.LabelFor(model => model.Operator)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'Money', title: '@Html.LabelFor(model => model.Money)', width: 90, editor: { type: 'numberbox' } },
+                { field: 'Source', title: '@Html.LabelFor(model => model.Source)', width: 100, editor: { type: 'validatebox' } },
+                { field: 'Description', title: '@Html.LabelFor(model => model.Description)', width: 100, editor: { type: 'validatebox' } },
+                { field: 'Invoice', title: '@Html.LabelFor(model => model.Invoice)', width: 100, editor: { type: 'validatebox' } },
+                { field: 'Remark', title: '@Html.LabelFor(model => model.Remark)', width: 100, editor: { type: 'validatebox' } }
+            ]],
+            toolbar: [
+               {
+                   text: '撤销', iconCls: 'fa fa-reply', handler: function () {
+                       editRow = undefined;
+                       $("#grid_list").datagrid('rejectChanges');
+                       $("#grid_list").datagrid('unselectAll');
+                   }
+               },
+           '-', {
+               text: '上移', iconCls: 'fa fa-arrow-up', handler: function () {
+                   MoveUp();
+               }
+           }, '-', {
+               text: '下移', iconCls: 'fa fa-arrow-down', handler: function () {
+                   MoveDown();
+               }
+           }],
+            onAfterEdit: function (rowIndex, rowData, changes) {
+                editRow = undefined;
+            },
+            onDblClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+                }
+
+                if (editRow == undefined) {
+                    $("#grid_list").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+
+                }
+
+            }
+        });
+    });
+    function MoveUp() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'up', 'grid_list');
+
+    }
+    //下移
+    function MoveDown() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'down', 'grid_list');
+
+    }
+
+    function mysort(index, type, gridname) {
+        if ("up" == type) {
+            if (index != 0) {
+                var toup = $('#' + gridname).datagrid('getData').rows[index];
+                var todown = $('#' + gridname).datagrid('getData').rows[index - 1];
+                $('#' + gridname).datagrid('getData').rows[index] = todown;
+                $('#' + gridname).datagrid('getData').rows[index - 1] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index - 1);
+                $('#' + gridname).datagrid('selectRow', index - 1);
+            }
+        } else if ("down" == type) {
+            var rows = $('#' + gridname).datagrid('getRows').length;
+            if (index != rows - 1) {
+                var todown = $('#' + gridname).datagrid('getData').rows[index];
+                var toup = $('#' + gridname).datagrid('getData').rows[index + 1];
+                $('#' + gridname).datagrid('getData').rows[index + 1] = todown;
+                $('#' + gridname).datagrid('getData').rows[index] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index + 1);
+                $('#' + gridname).datagrid('selectRow', index + 1);
+            }
+        }
+
+    }
+    function Refresh() {
+        $('#grid_list').datagrid('reload');
+        editRow = undefined;
+        $("#grid_list").datagrid('rejectChanges');
+        $("#grid_list").datagrid('unselectAll');
+    }
+</script>
+@Html.Partial("~/Views/Shared/_Partial_AutoGrid.cshtml")
+
+@*operation*@
+<script type="text/javascript">
+    //ifram 返回
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    }
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid_list").datagrid('load');
+        else
+            $("#grid_list").datagrid('reload');
+    }
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Resource.Tip', mes);
+    }
+    $(function () {
+        $("#btnQuery").click(function () {
+            var queryStr = $("#txtQuery").val();
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Resource.Tip', '@Resource.YouWantToDeleteTheSelectedRecords', function (r) {
+                    if (r) {
+                        $.post("/LianTong_SystemCenterFinancial/Delete?id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                $("#grid_list").datagrid('load');
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+                            else {
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+        $("#btnSave").click(function () {
+            $("#grid_list").datagrid('endEdit', editRow);
+            //如果调用acceptChanges(),使用getChanges()则获取不到编辑和新增的数据。
+            //使用JSON序列化datarow对象，发送到后台。
+            var rows = $("#grid_list").datagrid('getChanges');
+            var rowstr = JSON.stringify(rows);
+            $.post('/LianTong_SystemCenterFinancial/CreatByGrid', rowstr, function (data) {
+                $.messageBox5s('@Resource.Tip', data.message);
+                if (data.type == 1)
+                    $("#grid_list").datagrid('reload');
+            }, "json");
+        });
+        $("#btnAdd").click(function () {
+            if (editRow != undefined) {
+                $("#grid_list").datagrid('endEdit', editRow);
+            }
+            if (editRow == undefined) {
+                $("#grid_list").datagrid('insertRow', {
+                    index: 0,
+                    row: {}
+                });
+
+                $("#grid_list").datagrid('beginEdit', 0);
+                editRow = 0;
+            }
+        });
+        $("#btnDetails").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='100%' scrolling='auto' frameborder='0' src='/LianTong/LianTong_SystemCenterFinancial/Details?ProjectId=" + row.Id + "&Iedate=" + GetGuid() + "'></iframe>");
+                $("#modalwindow").window({ title: '@Resource.Details', width: 720, height: 400, iconCls: 'fa fa-list' }).window('open');
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+    });
+</script>

@@ -1,0 +1,6 @@
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.DAL.dll.config
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.DAL.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.DAL.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.DAL\obj\Debug\Apps.DAL.csprojResolveAssemblyReference.cache
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.DAL\obj\Debug\Apps.DAL.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.DAL\obj\Debug\Apps.DAL.pdb

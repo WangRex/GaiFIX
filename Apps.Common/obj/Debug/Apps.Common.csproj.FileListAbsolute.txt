@@ -1,0 +1,5 @@
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Common.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Common.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Common\obj\Debug\Apps.Common.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Common\obj\Debug\Apps.Common.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Common\obj\Debug\Apps.Common.csprojResolveAssemblyReference.cache

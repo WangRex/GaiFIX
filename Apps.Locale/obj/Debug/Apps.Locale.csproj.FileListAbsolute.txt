@@ -1,0 +1,9 @@
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Locale.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.Locale.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\en-US\Apps.Locale.resources.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\Apps.Locale.Resource.resources
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\Apps.Locale.Resource.en-US.resources
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\Apps.Locale.csproj.GenerateResource.Cache
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\en-US\Apps.Locale.resources.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\Apps.Locale.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.Locale\obj\Debug\Apps.Locale.pdb

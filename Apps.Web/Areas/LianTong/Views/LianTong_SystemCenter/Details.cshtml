@@ -1,0 +1,143 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.LianTong.LianTong_SystemCenterModel
+@{
+    ViewBag.Title = "工程详细";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+}
+<style type="text/css">
+    .grid {
+        font: 12px arial,helvetica,sans-serif;
+        border: 1px solid #8DB2E3;
+    }
+
+        .grid td {
+            font: 100% arial,helvetica,sans-serif;
+            height: 24px;
+            padding: 5px;
+        }
+
+    .grid {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .grid th {
+            background: #E7F3FE;
+            height: 27px;
+            line-height: 27px;
+            border: 1px solid #8DB2E3;
+            padding-left: 5px;
+        }
+
+        .grid td {
+            border: 1px solid #8DB2E3;
+            padding-left: 5px;
+        }
+</style>
+<script src="@Url.Content("~/Scripts/template.js")"></script>
+<div class="grid" id="Details">
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $.ajax({
+            url: "/LianTong/LianTong_SystemCenter/GetDetails",
+            type: "Post",
+            data: { ProjectId: @ViewBag.ProjectId },
+            dataType: "json",
+            success: function (data) {
+                var html = template('Details-template', data);
+                $("#Details").html(html);
+            }
+        });
+    });
+</script>
+
+<script id="Details-template" type="text/html">
+    <table style="width:100%;">
+        <tr>
+            <th>集成中心负责人</th>
+            <th>项目名称</th>
+            <th>属地</th>
+        </tr>
+        <tr>
+            <td>{{leaderName}}</td>
+            <td>{{projectName}}</td>
+            <td>{{projectAttribution}}</td>
+        </tr>
+        <tr>
+            <th>区域</th>
+            <th>项目类别</th>
+            <th>联通公司客户经理</th>
+        </tr>
+        <tr>
+            <td>{{projectArea}}</td>
+            <td>{{projectType}}</td>
+            <td>{{AccountManager}}</td>
+        </tr>
+        <tr>
+            <th>联通公司客户</th>
+            <th>联通公司系统支撑</th>
+            <th>用户地址</th>
+        </tr>
+        <tr>
+            <td>{{UnicomAccount}}</td>
+            <td>{{SystemSupport}}</td>
+            <td>{{adress}}</td>
+        </tr>
+        <tr>
+            <th>用户联系人</th>
+            <th>用户联系方式</th>
+            <th>设备选型</th>
+        </tr>
+        <tr>
+            <td>{{contactPeople}}</td>
+            <td>{{contactWay}}</td>
+            <td>{{equipmentType}}</td>
+        </tr>
+        <tr>
+            <th>设备经销商</th>
+            <th>施工部门</th>
+            <th>合同金额</th>
+        </tr>
+        <tr>
+            <td>{{equipmentDealer}}</td>
+            <td>{{constructionDepartment}}</td>
+            <td>{{contractCost}}</td>
+        </tr>
+        <tr>
+            <th>设备采购金额</th>
+            <th>施工费用</th>
+            <th>利润</th>
+        </tr>
+        <tr>
+            <td>{{equipmentCost}}</td>
+            <td>{{projectCost}}</td>
+            <td>{{Profit}}</td>
+        </tr>
+        <tr>
+            <th>利润率</th>
+            <th>维保部门</th>
+            <th>维保年限</th>
+        </tr>
+        <tr>
+            <td>{{ProfitRate}}</td>
+            <td>{{maintenanceDepartment}}</td>
+            <td>{{maintenancePeriod}}</td>
+        </tr>
+        <tr>
+            <th>合同签订时间</th>
+            <th>合同结束时间</th>
+            <th>备注</th>
+        </tr>
+        <tr>
+            <td>{{contractStartDate}}</td>
+            <td>{{contractEndDate}}</td>
+            <td>{{Comments}}</td>
+        </tr>
+    </table>
+
+</script>

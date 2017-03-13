@@ -1,0 +1,6 @@
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.BLL.dll.config
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.BLL.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\packages\Apps.BLL.pdb
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.BLL\obj\Debug\Apps.BLL.csprojResolveAssemblyReference.cache
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.BLL\obj\Debug\Apps.BLL.dll
+C:\Rex\SVN\GaiFIX\trunk\Gai\Apps.BLL\obj\Debug\Apps.BLL.pdb

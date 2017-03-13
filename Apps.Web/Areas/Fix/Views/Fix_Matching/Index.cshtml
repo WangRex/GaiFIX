@@ -1,0 +1,272 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.FIX.FIX_MatchingModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div class="mvctool">
+    <div>
+        <input type="hidden" id="DepId" />
+        部门<input class="easyui-combotree" id="structTree" style="width:150px;height:28px;">
+        状态<select id="StatusSelect" class="easyui-combobox" style="width:200px;">
+            <option value="">--请选择--</option>
+            <option value="未匹配">未匹配</option>
+            <option value="已匹配">已匹配</option>
+        </select>
+    </div>
+    @Html.ToolButton("btnQuery", "fa fa-search", "查询", ref perm, "Query", true)
+    @Html.ToolButton("btnAdd", "fa fa-plus", "添加", ref perm, "Create", true)
+    @Html.ToolButton("btnSave", "fa fa-save", Resource.Save, ref perm, "Save", true)
+    @Html.ToolButton("btnDelete", "fa fa-trash", Resource.Delete, ref perm, "Delete", true)
+    @Html.ToolButton("btnMatching", "fa fa-user-plus", "匹配外线员", ref perm, "Matching", true)
+</div>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+<table id="grid_list"></table>
+<div id="Pager"></div>
+<script type="text/javascript">
+    var departmentCombList = "";
+    function unitformatterDep(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < departmentCombList.length; i++) {
+            if (departmentCombList[i].Id == value) {
+                return departmentCombList[i].Name;
+            }
+        }
+    };
+    $.ajax({
+        type: "post",
+        url: "/SysStruct/departmentJsonList",
+        async: false,
+        success: function (data) {
+            departmentCombList = data;
+        }
+    });
+    function SetPosTree(depId, refFlag) {
+        $('#posTree').combotree({
+            url: '/SysPosition/GetPosListByComTree?depId=' + depId
+                 , onSelect: function (node) {
+                     $("#PosId").val(node.id);
+                 }, onLoadSuccess: function (node, data) { //加载成功选择第一行
+
+                 }
+        });
+    }
+    //分类combotree
+    $('#structTree').combotree({
+        url: '/SysStruct/GetListByComTree?id=root'
+        , onSelect: function (node) {
+            $("#DepId").val(node.id);
+            $("#PosId").val("");
+            $('#posTree').combotree('setValue', "");
+            SetPosTree(node.id)
+        }, onLoadSuccess: function (node, data) { //加载成功选择第一行
+
+            SetPosTree($("#DepId").val(), true);
+        }
+    });
+    var StatusCombList = [{ "value": "未匹配", "text": "未匹配" }, { "value": "已匹配", "text": "已匹配" }];
+    function unitformatterStatus(value, rowData, rowIndex) {
+        if (value == 0) {
+            return;
+        }
+        for (var i = 0; i < StatusCombList.length; i++) {
+            if (StatusCombList[i].value == value) {
+                return StatusCombList[i].text;
+            }
+        }
+    };
+    var editRow = undefined;
+    $(function () {
+        $('#grid_list').datagrid({
+            url: '/Fix_Matching/GetList',
+            width: SetGridWidthSub(10),
+            methord: 'post',
+            singleSelect: true,
+            height: SetGridHeightSub(85),
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true,
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 25, hidden: true },
+                { field: 'Address', title: '@Html.LabelFor(model => model.Address)', width: 200, editor: { type: 'validatebox' } },
+                { field: 'Status', title: '@Html.LabelFor(model => model.Status)', width: 120, formatter: unitformatterStatus, editor: { type: 'combobox', options: { data: StatusCombList, valueField: "value", textField: "text" } } },
+                { field: 'OTM_Name', title: '@Html.LabelFor(model => model.OTM_Name)', width: 100 },
+                { field: 'department', title: '@Html.LabelFor(model => model.department)', width: 120, formatter: unitformatterDep, editor: { type: 'combobox', options: { data: departmentCombList, valueField: "Id", textField: "Name" } } },
+            ]],
+            toolbar: [
+                {
+                    text: '撤销', iconCls: 'fa fa-reply', handler: function () {
+                        editRow = undefined;
+                        $("#grid_list").datagrid('rejectChanges');
+                        $("#grid_list").datagrid('unselectAll');
+                    }
+                },
+            '-', {
+                text: '上移', iconCls: 'fa fa-arrow-up', handler: function () {
+                    MoveUp();
+                }
+            }, '-', {
+                text: '下移', iconCls: 'fa fa-arrow-down', handler: function () {
+                    MoveDown();
+                }
+            }],
+            onAfterEdit: function (rowIndex, rowData, changes) {
+                editRow = undefined;
+            },
+            onDblClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+                }
+
+                if (editRow == undefined) {
+                    $("#grid_list").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+
+                }
+
+            }
+        });
+    });
+    function MoveUp() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'up', 'grid_list');
+
+    }
+    //下移
+    function MoveDown() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'down', 'grid_list');
+
+    }
+
+    function mysort(index, type, gridname) {
+        if ("up" == type) {
+            if (index != 0) {
+                var toup = $('#' + gridname).datagrid('getData').rows[index];
+                var todown = $('#' + gridname).datagrid('getData').rows[index - 1];
+                $('#' + gridname).datagrid('getData').rows[index] = todown;
+                $('#' + gridname).datagrid('getData').rows[index - 1] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index - 1);
+                $('#' + gridname).datagrid('selectRow', index - 1);
+            }
+        } else if ("down" == type) {
+            var rows = $('#' + gridname).datagrid('getRows').length;
+            if (index != rows - 1) {
+                var todown = $('#' + gridname).datagrid('getData').rows[index];
+                var toup = $('#' + gridname).datagrid('getData').rows[index + 1];
+                $('#' + gridname).datagrid('getData').rows[index + 1] = todown;
+                $('#' + gridname).datagrid('getData').rows[index] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index + 1);
+                $('#' + gridname).datagrid('selectRow', index + 1);
+            }
+        }
+
+    }
+    function Refresh() {
+        $('#grid_list').datagrid('reload');
+        editRow = undefined;
+        $("#grid_list").datagrid('rejectChanges');
+        $("#grid_list").datagrid('unselectAll');
+    }
+</script>
+@Html.Partial("~/Views/Shared/_Partial_AutoGrid.cshtml")
+
+@*operation*@
+<script type="text/javascript">
+    //ifram 返回
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    }
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid_list").datagrid('load');
+        else
+            $("#grid_list").datagrid('reload');
+    }
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Resource.Tip', mes);
+    }
+    $(function () {
+        $("#btnQuery").click(function () {
+            var DepId = $("#DepId").val();
+            var StatusValue = $("#StatusSelect").combobox('getValue');
+            $("#grid_list").datagrid("load", { DepId: DepId, StatusValue: StatusValue });
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Resource.Tip', '@Resource.YouWantToDeleteTheSelectedRecords', function (r) {
+                    if (r) {
+                        $.post("/Fix_Matching/Delete?id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                $("#grid_list").datagrid('load');
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+                            else {
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+
+                        }, "json");
+
+                    }
+                });
+            } else { $.messageBox5s('@Resource.Tip', '@Resource.PlaseChooseToOperatingRecords'); }
+        });
+
+        $("#btnSave").click(function () {
+            $("#grid_list").datagrid('endEdit', editRow);
+            var rows = $("#grid_list").datagrid('getChanges');
+            var rowstr = JSON.stringify(rows);
+            $.post('/Fix_Matching/CreatByGrid', rowstr, function (data) {
+                $.messageBox5s('@Resource.Tip', data.message);
+                if (data.type == 1)
+                    $("#grid_list").datagrid('reload');
+            }, "json");
+        });
+        $("#btnAdd").click(function () {
+            if (editRow != undefined) {
+                $("#grid_list").datagrid('endEdit', editRow);
+            }
+            if (editRow == undefined) {
+                $("#grid_list").datagrid('insertRow', {
+                    index: 0,
+                    row: {}
+                });
+
+                $("#grid_list").datagrid('beginEdit', 0);
+                editRow = 0;
+            }
+        });
+        $("#btnMatching").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $("#modalwindow").html("<iframe width='100%' height='100%' scrolling='no' frameborder='0' src='/Fix/Fix_Matching/UserBindingPage?matchingId=" + row.Id + "&depId=" + row.department + "&Ieguid=" + GetGuid() + "'></iframe>");
+                $("#modalwindow").window({ title: '匹配外线员', width: 720, height: 400, iconCls: 'fa fa-pencil' }).window('open');
+            } else { $.messageBox5s('@Resource.Tip', '请选择一个需要匹配外线员的地址'); }
+        });
+    });
+</script>
+
+

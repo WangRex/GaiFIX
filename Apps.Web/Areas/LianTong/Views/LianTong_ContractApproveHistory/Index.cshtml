@@ -1,0 +1,83 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.LianTong.LianTong_ContractApproveHistoryModels
+@{
+    ViewBag.Title = "合同审批记录";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div class="pd3">
+    <table id="AppHisList"></table>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $('#AppHisList').datagrid({
+            url: '/LianTong_ContractApproveHistory/GetList?ContractID=@ViewBag.ContractId',
+            width: SetGridWidthSub(6),
+            methord: 'post',
+            height: SetGridHeightSub(48),
+            fitColumns: true,
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 12,
+            pageList: [12, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: false,//单选模式
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 80, hidden: true },
+                { field: 'ApproveName', title: '@Html.LabelFor(model => model.ApproveName)', width: 80 },
+                { field: 'ApproveDate', title: '@Html.LabelFor(model => model.ApproveDate)', width: 80 },
+                { field: 'ApproveOldStatus', title: '@Html.LabelFor(model => model.ApproveOldStatus)', width: 80 },
+                { field: 'ApproveNewStatus', title: '@Html.LabelFor(model => model.ApproveNewStatus)', width: 80 }
+
+            ]],
+            onLoadSuccess: function () {
+                //var rows = $("#AppHisList").datagrid("getRows");
+                //for (var i = 0; i < rows.length; i++) {
+                //    //获取每一行的数据
+                //    $('#UserList').datagrid('beginEdit', i);
+                //}
+            }
+        });
+    });
+</script>
+
+@*operation*@
+<script type="text/javascript">
+    $(function () {
+        $("#btnSave").click(function () {
+
+            var rows = $("#UserList").datagrid("getRows"); //这段代码是获取当前页的所有行。
+            var data = new Array();
+            for (var i = 0; i < rows.length; i++) {
+                var setFlag = $("td[field='Flag'] input").eq(i).prop("checked");
+                if (setFlag)//判断是否有作修改
+                {
+                    data.push(rows[i].Id);
+                }
+            }
+            var roleIds = data.join();
+            //提交数据库
+            $.post("/LianTong_ProjectContracts/BindingProject", { ContractsId: '@(ViewBag.ContractsId)', projectIds: roleIds },
+             function (data) {
+                 if (data.type == 1) {
+                     window.parent.frameReturnByMes(data.message);
+                     window.parent.frameReturnByReload(true);
+                     window.parent.frameReturnByClose()
+                 }
+                 else {
+                     window.parent.frameReturnByMes(data.message);
+                 }
+             }, "json");
+        });
+
+    });
+</script>

@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{54F6CD9E-178F-4240-8A67-33E79CB5F2C9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Apps.Models</RootNamespace>
+    <AssemblyName>Apps.Models</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\packages\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\packages\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.Entity">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Calendar\TaskModel.cs" />
+    <Compile Include="DbContexts.cs" />
+    <Compile Include="Enum\WeChatEnum.cs" />
+    <Compile Include="FIX\FIX_AssessmentModel.cs" />
+    <Compile Include="FIX\FIX_BaseModels.cs" />
+    <Compile Include="FIX\FIX_CustomerModel.cs" />
+    <Compile Include="FIX\FIX_MatchingModel.cs" />
+    <Compile Include="FIX\FIX_OrderHistoryModel.cs" />
+    <Compile Include="FIX\FIX_OrderModel.cs" />
+    <Compile Include="FIX\FIX_OutsideTroubleManModel.cs" />
+    <Compile Include="Flow\Flow_Seal.cs" />
+    <Compile Include="LianTong\LianTong_ContractApproveHistoryModels.cs" />
+    <Compile Include="LianTong\LianTong_ProjectContractsModel.cs" />
+    <Compile Include="LianTong\LianTong_ProjectModel.cs" />
+    <Compile Include="LianTong\LianTong_SystemCenterFinancialModel.cs" />
+    <Compile Include="LianTong\LianTong_SystemCenterModel.cs" />
+    <Compile Include="LianTong\LianTong_ContractsCntViewModels.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="MIS\MIS_WebIM_Message_Rec.cs" />
+    <Compile Include="RongHai\ChildrenInfo.cs" />
+    <Compile Include="RongHai\ClassInfo.cs" />
+    <Compile Include="RongHai\TeacherInfo.cs" />
+    <Compile Include="Spl\Spl_Person.cs" />
+    <Compile Include="Spl\Spl_ProductCategory.cs" />
+    <Compile Include="Sys\SysModule.cs" />
+    <Compile Include="Sys\SysRoleSysUser.cs" />
+    <Compile Include="WC\WC_Group.cs" />
+    <Compile Include="WC\WC_MessageResponse.cs" />
+    <Compile Include="WC\WC_OfficalAccountsModel.cs" />
+    <Compile Include="Common\ChartsModel.cs" />
+    <Compile Include="DEF\DEF_CaseTypeModel.cs" />
+    <Compile Include="DEF\DEF_DefectModel.cs" />
+    <Compile Include="DEF\DEF_TestCaseModel.cs" />
+    <Compile Include="DEF\DEF_TestCaseRelationModel.cs" />
+    <Compile Include="DEF\DEF_TestCaseStepsModel.cs" />
+    <Compile Include="DEF\DEF_TestJobsDetailItemModel.cs" />
+    <Compile Include="DEF\DEF_TestJobsDetailModel.cs" />
+    <Compile Include="DEF\DEF_TestJobsDetailRelationModel.cs" />
+    <Compile Include="DEF\DEF_TestJobsDetailStepsModel.cs" />
+    <Compile Include="DEF\DEF_TestJobsModel.cs" />
+    <Compile Include="Enum\FlowEnum.cs" />
+    <Compile Include="Flow\Flow_CommonModel.cs" />
+    <Compile Include="Flow\Flow_FormAttrModel.cs" />
+    <Compile Include="Flow\Flow_FormContentModel.cs" />
+    <Compile Include="Flow\Flow_FormContentStepCheckModel.cs" />
+    <Compile Include="Flow\Flow_FormContentStepCheckStateModel.cs" />
+    <Compile Include="Flow\Flow_FormModel.cs" />
+    <Compile Include="Flow\Flow_StepModel.cs" />
+    <Compile Include="Flow\Flow_StepRuleModel.cs" />
+    <Compile Include="Flow\Flow_TypeModel.cs" />
+    <Compile Include="ICommon.cs" />
+    <Compile Include="JOB\JOB_TASKJOBSModel.cs" />
+    <Compile Include="JOB\JOB_TASKJOBS_LOGModel.cs" />
+    <Compile Include="JOB\JobModel.cs" />
+    <Compile Include="MIS\MIS_ArticleModel.cs" />
+    <Compile Include="MIS\MIS_Article_AlbumsModel.cs" />
+    <Compile Include="MIS\MIS_Article_CategoryModel.cs" />
+    <Compile Include="MIS\MIS_Article_CommentModel.cs" />
+    <Compile Include="MIS\MIS_WebIM_CommonTalkModel.cs" />
+    <Compile Include="MIS\MIS_WebIM_GroupModel.cs" />
+    <Compile Include="MIS\MIS_WebIM_MessageModel.cs" />
+    <Compile Include="MIS\MIS_WebIM_RecentContactModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spl\Spl_ProductModel.cs" />
+    <Compile Include="Sys\AccountModel.cs" />
+    <Compile Include="Sys\permModel.cs" />
+    <Compile Include="Sys\SysAppOauth.cs" />
+    <Compile Include="Sys\SysAreasModel.cs" />
+    <Compile Include="Sys\SysConfigModel.cs" />
+    <Compile Include="Sys\SysExceptionModel.cs" />
+    <Compile Include="Sys\SysLogModel.cs" />
+    <Compile Include="Sys\SysModuleOperateModel.cs" />
+    <Compile Include="Sys\SysPositionModel.cs" />
+    <Compile Include="Sys\SysRight.cs" />
+    <Compile Include="Sys\SysRightOperateModel.cs" />
+    <Compile Include="Sys\SysRoleModel.cs" />
+    <Compile Include="Sys\SysSampleModel.cs" />
+    <Compile Include="Sys\SysSettingsModel.cs" />
+    <Compile Include="Sys\SysStructModel.cs" />
+    <Compile Include="Sys\SysUserConfigModel.cs" />
+    <Compile Include="Sys\SysUserModel.cs" />
+    <Compile Include="ValidateAttribute.cs" />
+    <Compile Include="WC\WC_ResponseLog.cs" />
+    <Compile Include="WC\WC_User.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Apps.Common\Apps.Common.csproj">
+      <Project>{6847a12a-20b8-4902-a688-2866c716a1ec}</Project>
+      <Name>Apps.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Apps.Locale\Apps.Locale.csproj">
+      <Project>{a670269b-b46c-4c77-be86-4be2d26cd126}</Project>
+      <Name>Apps.Locale</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

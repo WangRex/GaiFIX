@@ -1,0 +1,219 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.LianTong.LianTong_SystemCenterModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div class="mvctool">
+    <input id="txtQuery" type="text" class="searchText" />
+    @Html.ToolButton("btnQuery", "fa fa-search", "查询", ref perm, "Query", true)
+    @Html.ToolButton("btnAdd", "fa fa-plus", "添加", ref perm, "Create", true)
+    @Html.ToolButton("btnSave", "fa fa-save", Resource.Save, ref perm, "Save", true)
+    @Html.ToolButton("btnDelete", "fa fa-trash", Resource.Delete, ref perm, "Delete", true)
+</div>
+<div id="modalwindow" class="easyui-window" data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+<table id="grid_list"></table>
+<div id="Pager"></div>
+<script type="text/javascript">
+
+    var editRow = undefined;
+    $(function () {
+        $('#grid_list').datagrid({
+            url: '/LianTong_SystemCenter/GetList',
+            width: SetGridWidthSub(10),
+            method: 'post',
+            singleSelect: true,
+            height: SetGridHeightSub(45),
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 15,
+            pageList: [15, 20, 30, 40, 50],
+            pagination: true,
+            striped: true,
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 25, hidden: true },
+                 { field: 'leaderName', title: '@Html.LabelFor(model => model.leaderName)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'projectName', title: '@Html.LabelFor(model => model.projectName)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'projectAttribution', title: '@Html.LabelFor(model => model.projectAttribution)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'projectArea', title: '@Html.LabelFor(model => model.projectArea)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'projectType', title: '@Html.LabelFor(model => model.projectType)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'AccountManager', title: '@Html.LabelFor(model => model.AccountManager)', width: 100, editor: { type: 'validatebox' } },
+                { field: 'adress', title: '@Html.LabelFor(model => model.adress)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'contactPeople', title: '@Html.LabelFor(model => model.contactPeople)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'contactWay', title: '@Html.LabelFor(model => model.contactWay)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'equipmentType', title: '@Html.LabelFor(model => model.equipmentType)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'equipmentDealer', title: '@Html.LabelFor(model => model.equipmentDealer)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'constructionDepartment', title: '@Html.LabelFor(model => model.constructionDepartment)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'contractCost', title: '@Html.LabelFor(model => model.contractCost)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'equipmentCost', title: '@Html.LabelFor(model => model.equipmentCost)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'projectCost', title: '@Html.LabelFor(model => model.projectCost)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'maintenanceDepartment', title: '@Html.LabelFor(model => model.maintenanceDepartment)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'maintenancePeriod', title: '@Html.LabelFor(model => model.maintenancePeriod)', width: 90, editor: { type: 'validatebox' } },
+                { field: 'contractStartDate', title: '@Html.LabelFor(model => model.contractStartDate)', width: 100, sortable: true, editor: { type: 'datebox' } },
+                { field: 'contractEndDate', title: '@Html.LabelFor(model => model.contractEndDate)', width: 100, sortable: true, editor: { type: 'datebox' } }
+
+            ]],
+            toolbar: [
+               {
+                   text: '撤销', iconCls: 'fa fa-reply', handler: function () {
+                       editRow = undefined;
+                       $("#grid_list").datagrid('rejectChanges');
+                       $("#grid_list").datagrid('unselectAll');
+                   }
+               },
+           '-', {
+               text: '上移', iconCls: 'fa fa-arrow-up', handler: function () {
+                   MoveUp();
+               }
+           }, '-', {
+               text: '下移', iconCls: 'fa fa-arrow-down', handler: function () {
+                   MoveDown();
+               }
+           }],
+            onAfterEdit: function (rowIndex, rowData, changes) {
+                editRow = undefined;
+            },
+            onDblClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+                }
+
+                if (editRow == undefined) {
+                    $("#grid_list").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#grid_list").datagrid('endEdit', editRow);
+
+                }
+
+            }
+        });
+    });
+    function MoveUp() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'up', 'grid_list');
+
+    }
+    //下移
+    function MoveDown() {
+        var row = $("#grid_list").datagrid('getSelected');
+        var index = $("#grid_list").datagrid('getRowIndex', row);
+        mysort(index, 'down', 'grid_list');
+
+    }
+
+    function mysort(index, type, gridname) {
+        if ("up" == type) {
+            if (index != 0) {
+                var toup = $('#' + gridname).datagrid('getData').rows[index];
+                var todown = $('#' + gridname).datagrid('getData').rows[index - 1];
+                $('#' + gridname).datagrid('getData').rows[index] = todown;
+                $('#' + gridname).datagrid('getData').rows[index - 1] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index - 1);
+                $('#' + gridname).datagrid('selectRow', index - 1);
+            }
+        } else if ("down" == type) {
+            var rows = $('#' + gridname).datagrid('getRows').length;
+            if (index != rows - 1) {
+                var todown = $('#' + gridname).datagrid('getData').rows[index];
+                var toup = $('#' + gridname).datagrid('getData').rows[index + 1];
+                $('#' + gridname).datagrid('getData').rows[index + 1] = todown;
+                $('#' + gridname).datagrid('getData').rows[index] = toup;
+                $('#' + gridname).datagrid('refreshRow', index);
+                $('#' + gridname).datagrid('refreshRow', index + 1);
+                $('#' + gridname).datagrid('selectRow', index + 1);
+            }
+        }
+
+    }
+    function Refresh() {
+        $('#grid_list').datagrid('reload');
+        editRow = undefined;
+        $("#grid_list").datagrid('rejectChanges');
+        $("#grid_list").datagrid('unselectAll');
+    }
+</script>
+@Html.Partial("~/Views/Shared/_Partial_AutoGrid.cshtml")
+
+@*operation*@
+<script type="text/javascript">
+    //ifram 返回
+    function frameReturnByClose() {
+        $("#modalwindow").window('close');
+    }
+    function frameReturnByReload(flag) {
+        if (flag)
+            $("#grid_list").datagrid('load');
+        else
+            $("#grid_list").datagrid('reload');
+    }
+    function frameReturnByMes(mes) {
+        $.messageBox5s('@Resource.Tip', mes);
+    }
+    $(function () {
+        $("#btnQuery").click(function () {
+            var queryStr = $("#txtQuery").val();
+            $("#grid_list").datagrid("load", { queryStr: queryStr });
+        });
+        $("#btnDelete").click(function () {
+            var row = $('#grid_list').datagrid('getSelected');
+            if (row != null) {
+                $.messager.confirm('@Resource.Tip', '@Resource.YouWantToDeleteTheSelectedRecords', function (r) {
+                    if (r) {
+                        $.post("/LianTong_SystemCenter/Delete?id=" + row.Id, function (data) {
+                            if (data.type == 1) {
+                                $("#grid_list").datagrid('load');
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+                            else
+                            {
+                                $.messageBox5s('@Resource.Tip', data.message);
+                            }
+
+                        }, "json");
+
+                    }
+                });
+            } else {$.messageBox5s('@Resource.Tip','@Resource.PlaseChooseToOperatingRecords'); }
+        });
+        $("#btnSave").click(function () {
+            $("#grid_list").datagrid('endEdit', editRow);
+            //如果调用acceptChanges(),使用getChanges()则获取不到编辑和新增的数据。
+            //使用JSON序列化datarow对象，发送到后台。
+            var rows = $("#grid_list").datagrid('getChanges');
+            var rowstr = JSON.stringify(rows);
+            $.post('/LianTong_SystemCenter/CreatByGrid', rowstr, function (data) {
+                $.messageBox5s('@Resource.Tip', data.message);
+                if (data.type == 1)
+                    $("#grid_list").datagrid('reload');
+            }, "json");
+        });
+        $("#btnAdd").click(function () {
+            if (editRow != undefined) {
+                $("#grid_list").datagrid('endEdit', editRow);
+            }
+            if (editRow == undefined) {
+                $("#grid_list").datagrid('insertRow', {
+                    index: 0,
+                    row: {}
+                });
+
+                $("#grid_list").datagrid('beginEdit', 0);
+                editRow = 0;
+            }
+        });
+    });
+</script>

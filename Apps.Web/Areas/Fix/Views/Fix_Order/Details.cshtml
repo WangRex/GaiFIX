@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "订单详细";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+}
+<style type="text/css">
+    .grid {
+        font: 12px arial,helvetica,sans-serif;
+        border: 1px solid #8DB2E3;
+    }
+
+        .grid td {
+            font: 100% arial,helvetica,sans-serif;
+            height: 24px;
+            padding: 5px;
+        }
+
+    .grid {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .grid th {
+            background: #E7F3FE;
+            height: 27px;
+            line-height: 27px;
+            border: 1px solid #8DB2E3;
+            padding-left: 5px;
+        }
+
+        .grid td {
+            border: 1px solid #8DB2E3;
+            padding-left: 5px;
+        }
+</style>
+<script src="@Url.Content("~/Scripts/template.js")"></script>
+<div class="grid" id="Details">
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $.ajax({
+            url: "/Fix/Fix_Order/GetDetails",
+            type: "Post",
+            data: { Id: @ViewBag.Id },
+            dataType: "json",
+            success: function (data) {
+                var html = template('Details-template', data);
+                $("#Details").html(html);
+            }
+        });
+    });
+</script>
+
+<script id="Details-template" type="text/html">
+    <table style="width:100%;">
+        <tr>
+            <th>用户姓名</th>
+            <td>{{Name}}</td>
+        </tr>
+        <tr>
+            <th>所在省市</th>
+            <td>{{Province}}</td>
+        </tr>
+        <tr>
+            <th>所在城市</th>
+            <td>{{City}}</td>
+        </tr>
+        <tr>
+            <th>所在辖区</th>
+            <td>{{Area}}</td>
+        </tr>
+        <tr>
+            <th>订单时间</th>
+            <td>{{Time}}</td>
+        </tr>
+        <tr>
+            <th>订单地址</th>
+            <td>{{Address}}</td>
+        </tr>
+        <tr>
+            <th>订单匹配地址</th>
+            <td>{{MatchingAddress}}</td>
+        </tr>
+        <tr>
+            <th>订单手机号</th>
+            <td>{{Phone}}</td>
+        </tr>
+        <tr>
+            <th>订单座机号</th>
+            <td>{{Tel}}</td>
+        </tr>
+        <tr>
+            <th>订单维修类型</th>
+            <td>{{Type}}</td>
+        </tr>
+        <tr>
+            <th>订单状态</th>
+            <td>{{Status}}</td>
+        </tr>
+        <tr>
+            <th>订单描述</th>
+            <td>{{Description}}</td>
+        </tr>
+        <tr>
+            <th>外线员姓名</th>
+            <td>{{OTM_Name}}</td>
+        </tr>
+        <tr>
+            <th>所属部门</th>
+            <td>{{departmentName}}</td>
+        </tr>
+        <tr>
+            <th>评价内容</th>
+            <td>{{Content}}</td>
+        </tr>
+        <tr>
+            <th>综合评价</th>
+            <td>{{ComprehensiveStar}}</td>
+        </tr>
+        <tr>
+            <th>问题解决</th>
+            <td>{{QuestionStar}}</td>
+        </tr>
+        <tr>
+            <th>态度评价</th>
+            <td>{{AttitudeStar}}</td>
+        </tr>
+    </table>
+
+</script>

@@ -1,0 +1,47 @@
+﻿@using Apps.Web.Core;
+@using Apps.Common;
+@using Apps.Models.Sys;
+@using Apps.Locale;
+@model Apps.Models.LianTong.LianTong_ProjectModel
+@{
+    ViewBag.Title = "关联工程详细";
+    //Layout = "~/Views/Shared/_Index_LayoutEdit.cshtml";
+    Layout = "~/Views/Shared/_Index_Layout.cshtml";
+
+    List<perm> perm = null;
+}
+
+<div class="pd3">
+    <table id="UserList"></table>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $('#UserList').datagrid({
+            url: '/LianTong_Project/GetTargetProjects?ContractsId=' + '@(ViewBag.ContractsId)',
+            width: SetGridWidthSub(6),
+            methord: 'post',
+            height: SetGridHeightSub(48),
+            fitColumns: true,
+            sortName: 'Id',
+            sortOrder: 'desc',
+            idField: 'Id',
+            pageSize: 12,
+            pageList: [12, 20, 30, 40, 50],
+            pagination: true,
+            striped: true, //奇偶行是否区分
+            singleSelect: false,//单选模式
+            nowrap: false,
+            columns: [[
+                { field: 'Id', title: '@Resource.TitleID', width: 80, hidden: true },
+                { field: 'projectNum', title: '@Html.LabelFor(model => model.projectNum)', width: 80},
+                { field: 'singleProjectName', title: '@Html.LabelFor(model => model.singleProjectName)', width: 80 },
+                { field: 'outlineCost', title: '@Html.LabelFor(model => model.outlineCost)', width: 80 },
+                { field: 'laborCost', title: '@Html.LabelFor(model => model.laborCost)', width: 80 },
+                { field: 'materialsCost', title: '@Html.LabelFor(model => model.materialsCost)', width: 80 },
+                { field: 'departmentName', title: '@Html.LabelFor(model => model.departmentName)', width: 80 }
+
+            ]]
+        });
+    });
+</script>

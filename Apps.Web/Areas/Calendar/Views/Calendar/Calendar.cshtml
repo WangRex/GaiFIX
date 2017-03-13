@@ -1,0 +1,372 @@
+﻿@using Apps.Locale;
+@{
+    Layout = null;
+}
+<link href="~/ACE_Content/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/ACE_Content/css/font-awesome.min.css" />
+<link rel="stylesheet" href="~/ACE_Content/css/googlefonts.css" />
+<link rel="stylesheet" href="~/ACE_Content/css/ace.min.css" />
+<link rel="stylesheet" href="~/ACE_Content/css/ace-rtl.min.css" />
+<link rel="stylesheet" href="~/ACE_Content/css/ace-skins.min.css" />
+<link rel="stylesheet" href="~/ACE_Content/css/fullcalendar.css" />
+<script src="~/ACE_Content/js/jquery-2.0.3.min.js"></script>
+<script src="~/ACE_Content/js/bootstrap.min.js"></script>
+<script src="~/ACE_Content/js/ace.min.js"></script>
+<script src="~/ACE_Content/js/ace-extra.min.js"></script>
+<script src="~/ACE_Content/js/ace-elements.min.js"></script>
+<script src="~/ACE_Content/js/typeahead-bs2.min.js"></script>
+<script src="~/ACE_Content/js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="~/ACE_Content/js/jquery.ui.touch-punch.min.js"></script>
+<script src="~/ACE_Content/js/fullcalendar.min.js"></script>
+<script src="~/ACE_Content/js/bootbox.min.js"></script>
+
+<div class="page-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="space"></div>
+
+                    <div id="calendar"></div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="widget-box transparent">
+                        <div class="widget-header">
+                            <h4>便签种类</h4>
+                        </div>
+
+                        <div class="widget-body">
+                            <div class="widget-main no-padding">
+                                <div id="external-events">
+
+                                    <div class="external-event label-danger" data-class="label-danger">
+                                        <i class="icon-move"></i>
+                                        系统消息
+                                    </div>
+
+                                    <div class="external-event label-success" data-class="label-success">
+                                        <i class="icon-move"></i>
+                                        会议通知
+                                    </div>
+
+                                    <div class="external-event label-grey" data-class="label-grey">
+                                        <i class="icon-move"></i>
+                                        过期任务
+                                    </div>
+
+                                    <div class="external-event label-purple" data-class="label-purple">
+                                        <i class="icon-move"></i>
+                                        个人任务1
+                                    </div>
+
+                                    <div class="external-event label-yellow" data-class="label-yellow">
+                                        <i class="icon-move"></i>
+                                        个人任务2
+                                    </div>
+
+                                    <div class="external-event label-pink" data-class="label-pink">
+                                        <i class="icon-move"></i>
+                                        个人任务2
+                                    </div>
+
+                                    <div class="external-event label-info" data-class="label-info">
+                                        <i class="icon-move"></i>
+                                        个人任务4
+                                    </div>
+
+                                    <label>
+                                        <input type="checkbox" class="ace ace-checkbox" id="drop-remove" />
+                                        <span class="lbl"> Remove after drop</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.page-content -->
+
+<script type="text/javascript">
+    jQuery(function ($) {
+
+        /* initialize the external events
+            -----------------------------------------------------------------*/
+
+        $('#external-events div.external-event').each(function () {
+
+            // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+            // it doesn't need to have a start or end
+            var eventObject = {
+                title: $.trim($(this).text()) // use the element's text as the event title
+            };
+
+            // store the Event Object in the DOM element so we can get to it later
+            $(this).data('eventObject', eventObject);
+
+            // make the event draggable using jQuery UI
+            $(this).draggable({
+                zIndex: 999,
+                revert: true,      // will cause the event to go back to its
+                revertDuration: 0  //  original position after the drag
+            });
+
+        });
+
+
+
+
+        /* initialize the calendar
+        -----------------------------------------------------------------*/
+
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+
+
+        var calendar = $('#calendar').fullCalendar({
+            buttonText: {
+                prev: '<i class="icon-chevron-left"></i>',
+                next: '<i class="icon-chevron-right"></i>'
+            },
+
+            //header: {
+            //    left: 'prev,next today',
+            //    center: 'title',
+            //    right: 'month,agendaWeek,agendaDay'
+            //},
+            header: {
+                left: 'month,agendaWeek,agendaDay',
+                center: 'title',
+                right: 'today, prev, next'
+            },
+            monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            monthNamesShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            dayNames: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            dayNamesShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            today: ["今天"],
+            firstDay: 1,
+            buttonText: {
+                prev: '&laquo;',
+                next: '&raquo;',
+                prevYear: '&nbsp;&lt;&lt;&nbsp;',
+                nextYear: '&nbsp;&gt;&gt;&nbsp;',
+                today: '今天',
+                month: '月',
+                week: '周',
+                day: '日'
+            },
+            //------------------------------------------------------------------------------
+            events: [
+            //{
+            //    title: 'All Day Event',
+            //    start: new Date(y, m, 1),
+            //    className: 'label-important'
+            //},
+            //{
+            //    title: 'Long Event',
+            //    start: new Date(y, m, d - 5),
+            //    end: new Date(y, m, d - 2),
+            //    className: 'label-success'
+            //},
+            //{
+            //    title: 'Some Event',
+            //    start: new Date(y, m, d - 3, 16, 0),
+            //    allDay: false
+            //}
+            ],
+            viewDisplay: function (view) {
+                //动态把数据查出，按照月份动态查询
+                var viewStart = $.fullCalendar.formatDate(view.start, "yyyy-MM-dd HH:mm:ss");
+                var viewEnd = $.fullCalendar.formatDate(view.end, "yyyy-MM-dd HH:mm:ss");
+                $("#calendar").fullCalendar('removeEvents');
+                //通过post 请求一般处理程序来返回需要展现的信息(start与end为需要传递的参数，在本文中没有用到可以忽略)
+                $.post("/Calendar/Calendar/Calendar_LoadEvent", { start: viewStart, end: viewEnd }, function (data) {
+                    var resultCollection = jQuery.parseJSON(data);
+                    $.each(resultCollection, function (index, term) {
+                        $("#calendar").fullCalendar('renderEvent', term, true);
+                    });
+
+                }); //把从后台取出的数据进行封装以后在页面上以fullCalendar的方式进行显示
+            },
+            //-----------------------------------------------------------------------------------------
+            editable: true,
+            droppable: true, // this allows things to be dropped onto the calendar !!!
+            eventDrop: function (event, dayDelta, minuteDelta, allDay, revertFunc) {    //拖拽事项之后的方法，allDay 是否全天事项，其他参数同上
+
+                var viewStart = $.fullCalendar
+                    .formatDate(event.start,
+                        'yyyy-MM-dd HH:mm:ss');
+                var viewEnd = $.fullCalendar
+                    .formatDate(event.end,
+                        'yyyy-MM-dd HH:mm:ss');
+                var viewClassName = String(event.className);
+                $.post("/Calendar/Calendar/Calendar_DropEvent", { id: event._id, start: viewStart, end: viewEnd, title: event.title, className: viewClassName, allDay: allDay }, function (data) {
+
+                    if (data.type == 0) {
+                           alert(data.message);
+                        revertFunc();
+                    }
+                });
+            },
+            drop: function (date, allDay) { // this function is called when something is dropped
+
+                // retrieve the dropped element's stored Event Object
+                var originalEventObject = $(this).data('eventObject');
+                var $extraEventClass = $(this).attr('data-class');
+
+                // we need to copy it, so that multiple events don't have a reference to the same object
+                var copiedEventObject = $.extend({}, originalEventObject);
+
+                // assign it the date that was reported
+                copiedEventObject.start = date;
+                copiedEventObject.allDay = allDay;
+                if ($extraEventClass) copiedEventObject['className'] = [$extraEventClass];
+
+                // render the event on the calendar
+                var viewStart = $.fullCalendar.formatDate(copiedEventObject.start, "yyyy-MM-dd HH:mm:ss");
+                var viewEnd = $.fullCalendar.formatDate(copiedEventObject.end, "yyyy-MM-dd HH:mm:ss");
+                var viewClassName = String(copiedEventObject.className);
+                $.post("/Calendar/Calendar/Calendar_AddEvent", { start: viewStart, end: viewEnd, title: copiedEventObject.title, className: viewClassName, allDay: allDay }, function (data) {
+
+                    if (data.type == 0) {
+
+                           alert(data.message);
+                        revertFunc();
+                    }
+                    else {
+                        copiedEventObject._id = data.Code;
+                        $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+                        // is the "remove after drop" checkbox checked?
+                        if ($('#drop-remove').is(':checked')) {
+                            // if so, remove the element from the "Draggable Events" list
+                            $(this).remove();
+                        }
+                    };
+                });
+
+
+            }
+            ,
+            selectable: true,
+            selectHelper: true,
+            select: function (start, end, allDay) {
+
+                bootbox.prompt("New Event Title:", function (title) {
+                    if (title !== null) {
+                        var viewStart = $.fullCalendar.formatDate(start, "yyyy-MM-dd HH:mm:ss");
+                        var viewEnd = $.fullCalendar.formatDate(end, "yyyy-MM-dd HH:mm:ss");
+                        var viewClassName = "label-info";
+
+                        $.post("/Calendar/Calendar/Calendar_AddEvent", { start: viewStart, end: viewEnd, title: title, className: viewClassName, allDay: allDay }, function (data) {
+
+                            if (data.type == 0) {
+                                alert(data.message);
+                             revertFunc();
+                            }
+                            else
+                            {
+                                calendar.fullCalendar('renderEvent',
+                               {
+                                   _id: data.Code,
+                                   title: title,
+                                   start: start,
+                                   end: end,
+                                   allDay: allDay
+                               },
+                               true // make the event "stick"
+                               );
+                                calendar.fullCalendar('unselect');
+                            }
+                        });
+                    }
+                });
+
+
+            }
+            ,
+            eventClick: function (calEvent, jsEvent, view) {
+
+                var form = $("<form class='form-inline'><label>Change event name &nbsp;</label></form>");
+                form.append("<input class='middle' autocomplete=off type=text value='" + calEvent.title + "' /> ");
+                form.append("<button type='submit' class='btn btn-sm btn-success'><i class='icon-ok'></i> Save</button>");
+
+                var div = bootbox.dialog({
+                    message: form,
+                    buttons: {
+                        "delete": {
+                            "label": "<i class='icon-trash'></i> Delete Event",
+                            "className": "btn-sm btn-danger",
+                            "callback": function () {
+                                $.post("/Calendar/Calendar/Calendar_DeleteEvent", { id: calEvent._id }, function (data) {
+                                    if (data.type == 0) {
+                                        alert(data.message);
+                                     revertFunc();
+                                    }
+                                    else
+                                    {
+                                        calendar.fullCalendar('removeEvents', function (ev) {
+                                            return (ev._id == calEvent._id);
+                                        });
+                                    }
+                                });
+
+                            }
+                        },
+                        "close": {
+                            "label": "<i class='icon-remove'></i> Close",
+                            "className": "btn-sm"
+                        }
+                    }
+
+                });
+
+                form.on('submit', function () {
+                    var bkTitle = calEvent.title;
+                    calEvent.title = form.find("input[type=text]").val();
+                    var viewStart = $.fullCalendar.formatDate(calEvent.start, "yyyy-MM-dd HH:mm:ss");
+                    var viewEnd = $.fullCalendar.formatDate(calEvent.end, "yyyy-MM-dd HH:mm:ss");
+                    var viewClassName = String(calEvent.className);
+
+
+                    $.post("/Calendar/Calendar/Calendar_AddEvent", { id: calEvent._id, start: viewStart, end: viewEnd, title: calEvent.title, className: viewClassName, allDay: calEvent.allDay }, function (data) {
+
+                        if (data.type == 0) {
+                               alert(data.message);
+                            revertFunc();
+
+                        }
+                        else
+                        {
+                            calEvent._id = data.Code;
+                            calendar.fullCalendar('updateEvent', calEvent,true);
+                        }
+                    });
+                    div.modal("hide");
+                    return false;
+                });
+
+
+
+
+                //console.log(calEvent.id);
+                //console.log(jsEvent);
+                //console.log(view);
+
+                // change the border color just for fun
+                //$(this).css('border-color', 'red');
+
+            }
+
+        });
+
+
+    });
+</script>
